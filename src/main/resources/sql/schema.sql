@@ -34,7 +34,7 @@ create table orders_product
     orders_product_id uuid primary key,
     orders_id         uuid         not null references orders on delete cascade,
     product_id        uuid         not null references product on delete cascade,
-    quantity          integer      not null,
+    quantity          smallint     not null,
     created_at        timestamp(3) not null,
     updated_at        timestamp(3) not null
 );

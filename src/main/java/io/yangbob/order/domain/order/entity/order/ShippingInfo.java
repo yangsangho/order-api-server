@@ -17,4 +17,8 @@ public class ShippingInfo {
     private String address;
     @Column(columnDefinition = "varchar")
     private String message;
+
+    int getAmount() {
+        return address.startsWith("서울") ? 0 : 3000;
+    }
 }

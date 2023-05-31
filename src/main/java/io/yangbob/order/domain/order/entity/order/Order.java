@@ -2,6 +2,7 @@ package io.yangbob.order.domain.order.entity.order;
 
 import io.yangbob.order.domain.common.entity.PrimaryKeyEntity;
 import io.yangbob.order.domain.member.entity.Member;
+import io.yangbob.order.domain.order.dto.OrderAmountDto;
 import io.yangbob.order.domain.order.dto.ProductWithQuantityDto;
 import io.yangbob.order.domain.order.entity.orderproduct.OrderProduct;
 import jakarta.persistence.*;
@@ -52,5 +53,22 @@ public class Order extends PrimaryKeyEntity<OrderId> {
 
     public List<OrderProduct> getOrderProducts() {
         return Collections.unmodifiableList(orderProducts);
+    }
+
+    public OrderAmountDto getAmounts() {
+        final long productsAmount = orderProducts.stream().mapToLong(OrderProduct::getAmount).sum();
+        final int shippingAmount = shippingInfo.getAmount();
+        final boolean hasDiscount = hasDiscount();
+
+        return new OrderAmountDto(
+                shippingAmount,
+                productsAmount,
+                hasDiscount,
+                (hasDiscount ? (long) (productsAmount * 0.9) : productsAmount) + shippingAmount
+        );
+    }
+
+    private boolean hasDiscount() {
+        return orderProducts.stream().mapToInt(OrderProduct::getQuantity).sum() >= 5;
     }
 }

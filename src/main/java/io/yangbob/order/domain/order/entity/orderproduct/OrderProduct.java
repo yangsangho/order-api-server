@@ -34,6 +34,10 @@ public class OrderProduct extends PrimaryKeyEntity<OrderProductId> {
     @JoinColumn(name = "product_id", columnDefinition = "uuid", nullable = false)
     private Product product;
 
-    @Column(columnDefinition = "integer", nullable = false)
+    @Column(columnDefinition = "smallint", nullable = false)
     private int quantity;
+
+    public long getAmount() {
+        return (long) quantity * product.getPrice();
+    }
 }
