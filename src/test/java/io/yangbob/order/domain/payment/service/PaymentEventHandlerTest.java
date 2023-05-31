@@ -12,6 +12,7 @@ import io.yangbob.order.domain.payment.entity.PaymentMethod;
 import io.yangbob.order.domain.payment.repository.PaymentRepository;
 import io.yangbob.order.domain.product.repository.ProductRepository;
 import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,7 +30,6 @@ class PaymentEventHandlerTest {
     private MemberRepository memberRepository;
     @Autowired
     private ProductRepository productRepository;
-
     @Autowired
     private PaymentRepository paymentRepository;
     @Autowired
@@ -40,6 +40,7 @@ class PaymentEventHandlerTest {
     private EntityManager em;
 
     @Test
+    @DisplayName("주문 완료처리 및 이벤트를 통해 Payment Entity 저장 테스트")
     void payAndSavePaymentTest() {
         Member member = EntityFactory.createMember();
         memberRepository.save(member);

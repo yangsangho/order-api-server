@@ -48,7 +48,7 @@ tasks.jacocoTestReport {
     classDirectories.setFrom(
             files(
                     classDirectories.files.collect {
-                        fileTree(dir: it, exclude: excludes)
+                        fileTree(dir: it, exclude: ["**/OrderApplication*"] + excludes)
                     }
             )
     )
