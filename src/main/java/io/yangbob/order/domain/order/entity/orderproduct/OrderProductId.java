@@ -14,5 +14,5 @@ import java.util.UUID;
 @EqualsAndHashCode
 public class OrderProductId implements Serializable {
     @Column(name = "orders_product_id", columnDefinition = "uuid", nullable = false)
-    private UUID id = UlidCreator.getMonotonicUlid().toUuid();
+    private final UUID id = UlidCreator.getMonotonicUlid().toUuid();
 }

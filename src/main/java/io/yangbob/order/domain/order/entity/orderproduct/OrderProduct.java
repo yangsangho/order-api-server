@@ -20,7 +20,7 @@ public class OrderProduct extends PrimaryKeyEntity<OrderProductId> {
     }
 
     public OrderProduct(Order order, Product product, int quantity) {
-        this();
+        super(new OrderProductId());
         this.order = order;
         this.product = product;
         this.quantity = quantity;

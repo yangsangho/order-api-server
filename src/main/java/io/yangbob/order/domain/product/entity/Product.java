@@ -16,7 +16,7 @@ public class Product extends PrimaryKeyEntity<ProductId> {
     }
 
     public Product(String name, int price) {
-        this();
+        super(new ProductId());
         this.name = name;
         this.price = price;
     }

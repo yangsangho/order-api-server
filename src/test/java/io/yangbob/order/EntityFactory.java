@@ -7,7 +7,6 @@ import io.yangbob.order.domain.order.entity.order.Receiver;
 import io.yangbob.order.domain.order.entity.order.ShippingInfo;
 import io.yangbob.order.domain.product.entity.Product;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class EntityFactory {
@@ -15,31 +14,29 @@ public class EntityFactory {
         return new Member("yangbob", "01012341234");
     }
 
-    public static Order createOrder() {
-        return createOrder(createMember());
+    public static Receiver createReceiver(Member member) {
+        return new Receiver(member.getName(), member.getPhoneNumber());
     }
 
-    public static Order createOrder(Member orderer) {
-        ArrayList<ProductWithQuantityDto> productWithQuantityList = new ArrayList<>();
-        Product p1 = EntityFactory.createProduct();
-        Product p2 = EntityFactory.createProduct("충전기", 6700);
-        productWithQuantityList.add(new ProductWithQuantityDto(p1, 1));
-        productWithQuantityList.add(new ProductWithQuantityDto(p2, 4));
-
-        return createOrder(orderer, productWithQuantityList);
+    public static ShippingInfo createShippingInfo(Member member) {
+        return new ShippingInfo(createReceiver(member), "서울특별시", "문 앞에 두세요");
     }
 
-    public static Order createOrder(Member orderer, List<ProductWithQuantityDto> productWithQuantityList) {
-        Receiver receiver = new Receiver(orderer.getName(), orderer.getPhoneNumber());
-        ShippingInfo shippingInfo = new ShippingInfo(receiver, "서울특별시", "문 앞에 두세요");
-        return new Order(orderer, shippingInfo, productWithQuantityList);
+    public static List<ProductWithQuantityDto> createProductWithQuantityList() {
+        Product p1 = new Product("선풍기", 125000);
+        Product p2 = new Product("충전기", 7000);
+        return List.of(new ProductWithQuantityDto(p1, 1), new ProductWithQuantityDto(p2, 4));
     }
 
-    public static Product createProduct() {
-        return new Product("선풍기", 125000);
+    public static Order createOorder() {
+        return createOorder(createMember());
     }
 
-    public static Product createProduct(String name, int price) {
-        return new Product(name, price);
+    public static Order createOorder(Member member) {
+        return createOorder(member, createProductWithQuantityList());
+    }
+
+    public static Order createOorder(Member member, List<ProductWithQuantityDto> productWithQuantityList) {
+        return new Order(member, createShippingInfo(member), productWithQuantityList);
     }
 }

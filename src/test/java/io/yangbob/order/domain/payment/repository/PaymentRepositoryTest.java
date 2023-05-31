@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,10 +32,9 @@ class PaymentRepositoryTest {
     @Test
     @DisplayName("기본적인 저장 및 조회")
     void saveAndFindAndDeleteTest() {
-        Member member = EntityFactory.createMember();
+        Member member = new Member("yangbob", "01012341234");
         memberRepository.save(member);
-
-        Order order = EntityFactory.createOrder(member, new ArrayList<>());
+        Order order = new Order(member, EntityFactory.createShippingInfo(member), List.of());
         orderRepository.save(order);
 
         PaymentMethod method = PaymentMethod.CARD;

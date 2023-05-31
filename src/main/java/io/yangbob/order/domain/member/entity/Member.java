@@ -17,7 +17,7 @@ public class Member extends PrimaryKeyEntity<MemberId> {
     }
 
     public Member(String name, String phoneNumber) {
-        this();
+        super(new MemberId());
         this.name = name;
         this.phoneNumber = phoneNumber;
     }

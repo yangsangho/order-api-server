@@ -1,18 +1,13 @@
 package io.yangbob.order.domain.order.dto;
 
-import lombok.*;
 import lombok.experimental.Accessors;
 
+public record OrderAmountDto(
+        int shippingAmount,
+        long productsAmount,
+        @Accessors(fluent = true)
+        boolean hasDiscount,
+        long totalAmount
+) {
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-@AllArgsConstructor
-@Getter
-@EqualsAndHashCode
-public class OrderAmountDto {
-    private int shippingAmount;
-    private long productsAmount;
-
-    @Accessors(fluent = true)
-    private boolean hasDiscount;
-    private long totalAmount;
 }

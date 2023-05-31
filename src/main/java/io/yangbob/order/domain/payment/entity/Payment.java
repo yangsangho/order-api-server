@@ -16,7 +16,7 @@ public class Payment extends PrimaryKeyEntity<PaymentId> {
     }
 
     public Payment(Order order, PaymentMethod method) {
-        this();
+        super(new PaymentId());
         this.order = order;
         this.method = method;
         this.methodData = "{}";
