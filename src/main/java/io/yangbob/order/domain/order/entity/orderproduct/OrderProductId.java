@@ -1,4 +1,4 @@
-package io.yangbob.order.domain.orderproduct.entity;
+package io.yangbob.order.domain.order.entity.orderproduct;
 
 import com.github.f4b6a3.ulid.UlidCreator;
 import jakarta.persistence.Column;

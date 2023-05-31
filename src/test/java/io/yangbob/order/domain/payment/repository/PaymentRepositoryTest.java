@@ -3,7 +3,7 @@ package io.yangbob.order.domain.payment.repository;
 import io.yangbob.order.EntityFactory;
 import io.yangbob.order.domain.member.entity.Member;
 import io.yangbob.order.domain.member.repository.MemberRepository;
-import io.yangbob.order.domain.order.entity.Order;
+import io.yangbob.order.domain.order.entity.order.Order;
 import io.yangbob.order.domain.order.repository.OrderRepository;
 import io.yangbob.order.domain.payment.entity.Payment;
 import io.yangbob.order.domain.payment.entity.PaymentId;
@@ -13,6 +13,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+
+import java.util.ArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,7 +35,7 @@ class PaymentRepositoryTest {
         Member member = EntityFactory.createMember();
         memberRepository.save(member);
 
-        Order order = EntityFactory.createOrder(member);
+        Order order = EntityFactory.createOrder(member, new ArrayList<>());
         orderRepository.save(order);
 
         PaymentMethod method = PaymentMethod.CARD;

@@ -1,4 +1,4 @@
-package io.yangbob.order.domain.order.entity;
+package io.yangbob.order.domain.order.entity.order;
 
 
 public enum OrderStatus {

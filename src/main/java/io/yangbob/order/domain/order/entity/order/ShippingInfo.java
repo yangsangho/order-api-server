@@ -1,4 +1,4 @@
-package io.yangbob.order.domain.order.entity;
+package io.yangbob.order.domain.order.entity.order;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

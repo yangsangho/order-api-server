@@ -1,7 +1,7 @@
 package io.yangbob.order.domain.payment.entity;
 
 import io.yangbob.order.domain.common.entity.PrimaryKeyEntity;
-import io.yangbob.order.domain.order.entity.Order;
+import io.yangbob.order.domain.order.entity.order.Order;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

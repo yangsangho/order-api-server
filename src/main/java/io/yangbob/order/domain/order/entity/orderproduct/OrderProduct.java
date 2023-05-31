@@ -1,8 +1,8 @@
-package io.yangbob.order.domain.orderproduct.entity;
+package io.yangbob.order.domain.order.entity.orderproduct;
 
 
 import io.yangbob.order.domain.common.entity.PrimaryKeyEntity;
-import io.yangbob.order.domain.order.entity.Order;
+import io.yangbob.order.domain.order.entity.order.Order;
 import io.yangbob.order.domain.product.entity.Product;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

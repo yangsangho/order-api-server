@@ -1,5 +1,7 @@
-package io.yangbob.order.domain.order.entity;
+package io.yangbob.order.domain.order.entity.order;
 
+import io.yangbob.order.domain.order.entity.order.Receiver;
+import io.yangbob.order.domain.order.entity.order.ShippingInfo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
