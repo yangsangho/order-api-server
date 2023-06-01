@@ -449,6 +449,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_ordercontroller">1. OrderController</a>
 <ul class="sectlevel2">
 <li><a href="#_주문_접수">1.1. 주문 접수</a></li>
+<li><a href="#_주문_완료_결제">1.2. 주문 완료 (결제)</a></li>
 </ul>
 </li>
 </ul>
@@ -589,7 +590,7 @@ Host: localhost:8080
 Content-Type: application/json;charset=UTF-8
 Content-Length: 50
 
-{"orderId":"018875ce-98f7-e6bf-9ec0-141d1897a47a"}</code></pre>
+{"orderId":"018875fb-9ea6-2791-17be-5f71b3d1d569"}</code></pre>
 </div>
 </div>
 <table class="tableblock frame-all grid-all stretch">
@@ -618,13 +619,64 @@ Content-Length: 50
 </tbody>
 </table>
 </div>
+<div class="sect2">
+<h3 id="_주문_완료_결제">1.2. 주문 완료 (결제)</h3>
+<div class="listingblock">
+<div class="title">http-request</div>
+<div class="content">
+<pre class="prettyprint highlight nowrap"><code data-lang="http">POST /orders/31111111-1111-1111-1111-111111111111 HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+Accept: application/json
+Content-Length: 30
+Host: localhost:8080
+
+{
+  "paymentMethod": "CARD"
+}</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">request-fields</caption>
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Field</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Constraints</th>
+<th class="tableblock halign-left valign-top">optional</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">paymentMethod</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">결제 수단 [ENUM] [CARD, EASY, VIRTUAL_ACCOUNT, PHONE]</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="listingblock">
+<div class="title">http-response</div>
+<div class="content">
+<pre class="prettyprint highlight nowrap"><code data-lang="http">HTTP/1.1 200 OK</code></pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2023-06-01 14:28:06 +0900
+Last updated 2023-06-01 17:01:24 +0900
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/run_prettify.min.js"></script>

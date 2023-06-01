@@ -27,3 +27,14 @@ include::{snippets}/take-order/http-response.adoc[]
 
 .response-fields
 include::{snippets}/take-order/response-fields.adoc[]
+
+=== 주문 완료 (결제)
+
+.http-request
+include::{snippets}/complete-order/http-request.adoc[]
+
+.request-fields
+include::{snippets}/complete-order/request-fields.adoc[]
+
+.http-response
+include::{snippets}/complete-order/http-response.adoc[]

@@ -1,10 +1,11 @@
 package io.yangbob.order.app.api.order.service;
 
-import util.EntityFactory;
+import io.yangbob.order.app.api.order.reqres.CompleteOrderRequest;
 import io.yangbob.order.app.api.order.reqres.ProductWithQuantityRequest;
 import io.yangbob.order.app.api.order.reqres.ShippingInfoRequest;
 import io.yangbob.order.app.api.order.reqres.TakeOrderRequest;
 import io.yangbob.order.app.common.exception.NoResourceException;
+import io.yangbob.order.domain.event.PayEvent;
 import io.yangbob.order.domain.member.entity.Member;
 import io.yangbob.order.domain.member.repository.MemberRepository;
 import io.yangbob.order.domain.order.entity.order.Order;
@@ -12,6 +13,7 @@ import io.yangbob.order.domain.order.entity.order.OrderId;
 import io.yangbob.order.domain.order.entity.order.OrderStatus;
 import io.yangbob.order.domain.order.entity.orderproduct.OrderProduct;
 import io.yangbob.order.domain.order.repository.OrderRepository;
+import io.yangbob.order.domain.payment.entity.PaymentMethod;
 import io.yangbob.order.domain.product.entity.Product;
 import io.yangbob.order.domain.product.repository.ProductRepository;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
+import util.EntityFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +45,9 @@ class OrderServiceTest {
     private ProductRepository productRepository;
     @Mock
     private OrderRepository orderRepository;
+
+    @Mock
+    private ApplicationEventPublisher publisher;
 
     @Test
     void takeOrderTest() {
@@ -111,5 +118,29 @@ class OrderServiceTest {
         );
 
         assertThatThrownBy(() -> orderService.takeOrder(request)).isInstanceOf(NoResourceException.class);
+    }
+
+    @Test
+    void completeOrderTest() {
+        Order order = EntityFactory.createOorder();
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.RECEIPTED);
+
+        when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+        doNothing().when(publisher).publishEvent(any(PayEvent.class));
+
+        PaymentMethod method = PaymentMethod.CARD;
+        orderService.completeOrder(order.getId().toString(), new CompleteOrderRequest(method));
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+
+        ArgumentCaptor<PayEvent> acPayEvent = ArgumentCaptor.forClass(PayEvent.class);
+        verify(publisher).publishEvent(acPayEvent.capture());
+        assertThat(acPayEvent.getValue().payment().getMethod()).isEqualTo(method);
+    }
+
+    @Test
+    void completeOrderNoOrderTest() {
+        OrderId orderId = new OrderId();
+        when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> orderService.completeOrder(orderId.toString(), new CompleteOrderRequest(PaymentMethod.CARD))).isInstanceOf(NoResourceException.class);
     }
 }
