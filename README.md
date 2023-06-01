@@ -16,10 +16,6 @@
 - H2 : 2.1.214
 - ULID Creator : 5.2.0
 
-### 실행 환경
-
-- H2 메모리 DB 활용
-
 ### API 요구사항 분석
 
 구체적인 요구사항이 없어서, <u>임의로 요구사항을 설정</u>했습니다.
@@ -65,22 +61,41 @@
 | API 이름  | 요구사항                                                                                                                                                     | Endpoint                           | Request Data                                               | Response Data                                                      |
 |---------|----------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------|------------------------------------------------------------|--------------------------------------------------------------------|
 | 주문 접수처리 | - 사용자가 특정 상품들을 담아서 주문한다.<br/>- 주문이 접수된 이후부터 조회가 가능하다.                                                                                                    | [POST] /orders                     | 주문자 id,<br/>상품 목록(상품 id & 수량)<br/>배송 정보(이름, 주소, 전화번호, 메세지) | 주문 id                                                              |
-| 주문 완료처리 | - 특정 주문에 대한 결제를 진행한다.                                                                                                                                    | [POST] /orders/{order-id}/complete | 결제 수단                                                      |                                                                    | 
+| 주문 완료처리 | - 특정 주문에 대한 결제를 진행한다.<br/>- 이미 완료된 주문이라면, 무시한다.                                                                                                          | [POST] /orders/{order-id}/complete | 결제 수단                                                      |                                                                    | 
 | 단일 주문조회 | - 하나의 주문에 대한 정보를 조회한다.<br/>- 결제 전이라면 결제 예정 금액을, 결제 후라면 결제한 금액 정보를 전달한다.                                                                                  | [GET] /orders/{order-id}           |                                                            | 주문 번호, 주문 상태, 주문 상품,<br/>결제 정보(금액,상태,수단), 주문 일시,<br/>주문자 정보, 배송 정보 | 
-| 주문 목록조회 | - 모든 주문 목록을 조회한다.<br/>- 페이지네이션을 적용한다.<br/>- 정렬 조건 : 주문 일시, 배송 주소<br/>- 필터 조건 : 주문 상태<br/>- 대표 상품 이름은 첫번째 상품 이름에<br/>나머지 상품의 개수를 합쳐 만든다.<br/>ex) 선풍기 외 3개 | [GET] /orders                      | 페이지 번호, 목록 개수,<br/>정렬 조건, 필터 조건                            | 대표 상품 이름, 주문 상태<br/>결제 금액, 주문 일시                                   |
+| 주문 목록조회 | - 모든 주문 목록을 조회한다.<br/>- 페이지네이션을 적용한다.<br/>- 정렬 조건 : 주문 일시, 배송 주소<br/>- 필터 조건 : 주문 상태<br/>- 대표 상품 이름은 첫번째 상품 이름에<br/>나머지 상품의 개수를 합쳐 만든다.<br/>ex) 선풍기 외 3개 | [GET] /orders                      | 페이지 번호, 목록 개수,<br/>정렬 조건, 필터 조건                            | 대표 상품 이름, 배송지, 주문 상태<br/>결제 금액, 주문 일시                              |
 
 ### DB 스키마
 
-![erd](https://github.com/yangsangho/order-api-server/assets/44158921/59e0931a-1208-45c7-aca0-4a81800815af)
+![erd](https://github.com/yangsangho/order-api-server/assets/44158921/987dcd57-5627-4467-993d-25c8bb864a2d)
 
 - [schema.sql](src/main/resources/sql/schema.sql)
 
-[rest docs](build/docs/asciidoc/index.html)
+### API 명세서
 
-사용 스택
-project structure
-api 명세서
-test coverage (mockito, jacoco)
-validation
-custom validation (resource bundle)
-cqrs
+Spring Rest Docs를 활용해서 작성했습니다.  
+로컬 환경에서 실행 후, [http://localhost:8080/docs/index.html](http://localhost:8080/docs/index.html) 에서 확인할 수 있습니다.
+<img width="843" alt="docs1" src="https://github.com/yangsangho/order-api-server/assets/44158921/307d57bb-5176-497d-bfa6-9ad025c8ad87">
+<img width="842" alt="docs2" src="https://github.com/yangsangho/order-api-server/assets/44158921/ffecc128-0179-4507-b463-b050fa8859b6">
+<img width="838" alt="docs3" src="https://github.com/yangsangho/order-api-server/assets/44158921/72cce26b-bad4-4e75-bbee-660dbcb41cfa">
+<img width="836" alt="docs4" src="https://github.com/yangsangho/order-api-server/assets/44158921/934d9088-4d74-449a-945c-6fb6faac3a90">
+<img width="836" alt="docs5" src="https://github.com/yangsangho/order-api-server/assets/44158921/2fd7026f-f4af-4361-b0d6-007be70a8014">
+
+### 테스트
+
+유닛테스트를 작성하고, Jacoco를 활용해 Test Coverage를 측정했습니다.
+<img width="1146" alt="test_coverage" src="https://github.com/yangsangho/order-api-server/assets/44158921/6ea74470-8066-4fff-be60-abb124718c4f">
+
+### 실행 및 확인
+
+- JDK 버전 17 이상이라면, 별도의 설정 없이 실행해서 확인해볼 수 있습니다.
+- 실행 시 사용할 초기 더미 데이터가 있습니다. [data.sql](src/main/resources/sql/data.sql)
+    - 아래의 ID를 참조해서, 주문 접수 Request Body를 만들 수 있습니다.
+    - member id
+        - 01887837-426e-d5fb-b9af-4cbc3619f044
+        - 0188786b-a80f-904c-5276-087998d7d930
+    - product id
+        - 01887839-e8f1-ed2f-c023-e4f629ebd8cd
+        - 0188783a-b1c0-88fd-9e79-787ad03616bb
+        - 0188783b-08dc-d8ac-c345-8a9e211afd5e
+- [PostMan](https://documenter.getpostman.com/view/16974043/2s93mBxKVV)에 접속해 Import 후 테스트를 직접 해볼 수 있습니다.

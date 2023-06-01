@@ -9,6 +9,7 @@ import io.yangbob.order.domain.member.repository.MemberRepository;
 import io.yangbob.order.domain.order.dto.ProductWithQuantityDto;
 import io.yangbob.order.domain.order.entity.order.Order;
 import io.yangbob.order.domain.order.entity.order.OrderId;
+import io.yangbob.order.domain.order.entity.order.OrderStatus;
 import io.yangbob.order.domain.order.repository.OrderQueryRepository;
 import io.yangbob.order.domain.order.repository.OrderRepository;
 import io.yangbob.order.domain.product.entity.Product;
@@ -29,7 +30,6 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderQueryRepository orderQueryRepository;
 
-
     public OrderId takeOrder(TakeOrderRequest request) {
         Member member = memberRepository.findById(new MemberId(request.ordererId())).orElseThrow(() -> new NoResourceException("member"));
 
@@ -47,6 +47,8 @@ public class OrderService {
 
     public void completeOrder(String orderId, CompleteOrderRequest request) {
         Order order = orderQueryRepository.find(new OrderId(orderId)).orElseThrow(() -> new NoResourceException("order"));
+        if (order.getStatus() == OrderStatus.COMPLETED) return;
+
         order.pay(publisher, request.paymentMethod());
     }
 }

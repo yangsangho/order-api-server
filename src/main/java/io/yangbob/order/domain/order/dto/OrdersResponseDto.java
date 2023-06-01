@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 public record OrdersResponseDto(
         String representativeProductName,
         OrderStatus status,
+        String address,
         long totalAmount,
         LocalDateTime orderTime
 ) {

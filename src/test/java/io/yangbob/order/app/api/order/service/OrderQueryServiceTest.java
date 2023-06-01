@@ -124,9 +124,9 @@ class OrderQueryServiceTest {
     @Test
     void findOrdersTest() {
         List<OrdersResponseDto> dtos = List.of(
-                new OrdersResponseDto("상품1 외 1건", OrderStatus.COMPLETED, 10000, LocalDateTime.now()),
-                new OrdersResponseDto("상품2", OrderStatus.RECEIPTED, 20000, LocalDateTime.now()),
-                new OrdersResponseDto("상품3 외 4건", OrderStatus.COMPLETED, 45000, LocalDateTime.now())
+                new OrdersResponseDto("상품1 외 1건", OrderStatus.COMPLETED, "서울특별시", 10000, LocalDateTime.now()),
+                new OrdersResponseDto("상품2", OrderStatus.RECEIPTED, "강원도", 20000, LocalDateTime.now()),
+                new OrdersResponseDto("상품3 외 4건", OrderStatus.COMPLETED, "부산광역시", 45000, LocalDateTime.now())
         );
 
         Pageable pageable = PageRequest.of(10, 3);

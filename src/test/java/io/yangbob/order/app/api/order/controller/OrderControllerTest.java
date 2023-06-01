@@ -194,8 +194,8 @@ class OrderControllerTest {
         OrderFilter filter = OrderFilter.STATUS_COMPLETED;
 
         List<OrdersResponseDto> dtos = List.of(
-                new OrdersResponseDto("상품1 외 1건", OrderStatus.COMPLETED, 10000, LocalDateTime.now()),
-                new OrdersResponseDto("상품2 외 4건", OrderStatus.COMPLETED, 45000, LocalDateTime.now())
+                new OrdersResponseDto("상품1 외 1건", OrderStatus.COMPLETED, "서울특별시", 10000, LocalDateTime.now()),
+                new OrdersResponseDto("상품2 외 4건", OrderStatus.COMPLETED, "부산광역시", 45000, LocalDateTime.now())
         );
         CommonPageResponse<OrdersResponseDto> response = new CommonPageResponse<>(2, 0, 0, 5, dtos);
         when(orderQueryService.findOrders(pageable, filter)).thenReturn(response);
@@ -228,6 +228,7 @@ class OrderControllerTest {
                                 fieldWithPath("elements").description("주문 목록"),
                                 fieldWithPath("elements[].representativeProductName").description("상품 대표 이름"),
                                 fieldWithPath("elements[].status").description("주문 상태"),
+                                fieldWithPath("elements[].address").description("배송지"),
                                 fieldWithPath("elements[].totalAmount").description("최종 결제 금액"),
                                 fieldWithPath("elements[].orderTime").description("주문 시간")
                         )

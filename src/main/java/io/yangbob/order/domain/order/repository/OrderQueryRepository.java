@@ -50,6 +50,7 @@ public class OrderQueryRepository {
     }
 
     public Page<OrdersResponseDto> findAll(Pageable pageable, OrderFilter filter) {
+        int orderCount0 = query.selectFrom(order).fetch().size();
         Long orderCount = query.select(order.count()).from(order).where(getWhere(filter)).fetchOne();
 
         List<Order> orders = query.selectFrom(order)
@@ -89,6 +90,7 @@ public class OrderQueryRepository {
                     new OrdersResponseDto(
                             representativeProductName,
                             order.getStatus(),
+                            order.getShippingInfo().getAddress(),
                             totalAmount,
                             order.getCreatedAt()
                     )
