@@ -1,6 +1,6 @@
 package io.yangbob.order.app.api.order.service;
 
-import io.yangbob.order.EntityFactory;
+import util.EntityFactory;
 import io.yangbob.order.app.api.order.reqres.ProductWithQuantityRequest;
 import io.yangbob.order.app.api.order.reqres.ShippingInfoRequest;
 import io.yangbob.order.app.api.order.reqres.TakeOrderRequest;

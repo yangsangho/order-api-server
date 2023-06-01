@@ -1,0 +1,12 @@
+:table-caption!:
+|===
+|Field|Type|Description|Constraints|optional
+
+{{#fields}}
+    |{{path}}
+    |{{type}}
+    |{{description}}
+    |{{constraints}}
+    |{{#optional}}true{{#defaults}} (기본값: {{defaults}}){{/defaults}}{{/optional}}
+{{/fields}}
+|===

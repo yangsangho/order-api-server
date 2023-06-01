@@ -17,10 +17,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(FIELD)
 @Retention(RUNTIME)
 @Constraint(validatedBy = {})
-@Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
+@Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", message = "{custom.validation.UUID.message}")
 @Repeatable(List.class)
 public @interface UUID {
-    String message() default "유효하지 않은 ID 형식입니다.";
+    String message() default "{custom.validation.UUID.message2}";
 
     Class<?>[] groups() default {};
 

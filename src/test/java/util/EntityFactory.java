@@ -1,4 +1,4 @@
-package io.yangbob.order;
+package util;
 
 import io.yangbob.order.domain.member.entity.Member;
 import io.yangbob.order.domain.order.dto.ProductWithQuantityDto;

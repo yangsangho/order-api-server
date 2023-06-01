@@ -1,0 +1,29 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+
+= 주문 관리 API
+:sectnums:
+:toc: left
+:toclevels: 4
+:toc-title: Table of Contents
+:source-highlighter: prettify
+
+Yang Sang Ho <yangsangho22@gmail.com>
+
+***
+== OrderController
+
+=== 주문 접수
+
+.http-request
+include::{snippets}/take-order/http-request.adoc[]
+
+.request-fields
+include::{snippets}/take-order/request-fields.adoc[]
+
+.http-response
+include::{snippets}/take-order/http-response.adoc[]
+
+.response-fields
+include::{snippets}/take-order/response-fields.adoc[]

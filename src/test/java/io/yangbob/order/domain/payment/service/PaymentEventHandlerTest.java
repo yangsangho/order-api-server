@@ -1,6 +1,6 @@
 package io.yangbob.order.domain.payment.service;
 
-import io.yangbob.order.EntityFactory;
+import util.EntityFactory;
 import io.yangbob.order.domain.member.entity.Member;
 import io.yangbob.order.domain.member.repository.MemberRepository;
 import io.yangbob.order.domain.order.dto.ProductWithQuantityDto;

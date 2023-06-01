@@ -61,3 +61,5 @@
 ### DB 스키마
 ![erd](https://github.com/yangsangho/order-api-server/assets/44158921/59e0931a-1208-45c7-aca0-4a81800815af)
 - [schema.sql](src/main/resources/sql/schema.sql)
+
+[rest docs](build/docs/asciidoc/index.html)

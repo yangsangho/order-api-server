@@ -1,5 +1,6 @@
 package io.yangbob.order.app.api.order.controller;
 
+import io.yangbob.order.app.api.order.reqres.CreatedOrderId;
 import io.yangbob.order.app.api.order.reqres.TakeOrderRequest;
 import io.yangbob.order.app.api.order.service.OrderService;
 import io.yangbob.order.domain.order.entity.order.OrderId;
@@ -18,9 +19,9 @@ public class OrderController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    String takeOrder(@Valid @RequestBody TakeOrderRequest request) {
+    CreatedOrderId takeOrder(@Valid @RequestBody TakeOrderRequest request) {
         log.info("takeOrder request = {}", request);
         OrderId createdID = orderService.takeOrder(request);
-        return createdID.toString();
+        return new CreatedOrderId(createdID.toString());
     }
 }

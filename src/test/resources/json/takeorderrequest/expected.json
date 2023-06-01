@@ -1,6 +1,6 @@
 {
   "ordererId": "11111111-1111-1111-1111-111111111111",
-  "productsWithQuantity": [
+  "productWithQuantities": [
     {
       "productId": "21111111-1111-1111-1111-111111111111",
       "quantity": 999

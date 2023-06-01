@@ -1,6 +1,6 @@
 package io.yangbob.order.domain.order.entity.order;
 
-import io.yangbob.order.EntityFactory;
+import util.EntityFactory;
 import io.yangbob.order.domain.event.PayEvent;
 import io.yangbob.order.domain.member.entity.Member;
 import io.yangbob.order.domain.order.dto.OrderAmountDto;
