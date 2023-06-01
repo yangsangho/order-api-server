@@ -1,5 +1,8 @@
 package io.yangbob.order.app.api.order.reqres;
 
+import io.yangbob.order.app.api.order.reqres.takeorder.ProductWithQuantityRequest;
+import io.yangbob.order.app.api.order.reqres.takeorder.ShippingInfoReqRes;
+import io.yangbob.order.app.api.order.reqres.takeorder.TakeOrderRequest;
 import io.yangbob.order.domain.order.entity.order.Receiver;
 import io.yangbob.order.domain.order.entity.order.ShippingInfo;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -30,7 +33,7 @@ class TakeOrderRequestTest {
                         new ProductWithQuantityRequest(UUID.randomUUID().toString(), 1),
                         new ProductWithQuantityRequest(UUID.randomUUID().toString(), 2)
                 ),
-                new ShippingInfoRequest(name, phoneNumber, address, message)
+                new ShippingInfoReqRes(name, phoneNumber, address, message)
         );
 
         assertThat(request.makeShippingInfo()).isEqualTo(

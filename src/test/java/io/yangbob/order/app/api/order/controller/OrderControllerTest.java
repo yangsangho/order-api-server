@@ -1,12 +1,16 @@
 package io.yangbob.order.app.api.order.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.yangbob.order.app.api.order.reqres.CompleteOrderRequest;
-import io.yangbob.order.app.api.order.reqres.ProductWithQuantityRequest;
-import io.yangbob.order.app.api.order.reqres.ShippingInfoRequest;
-import io.yangbob.order.app.api.order.reqres.TakeOrderRequest;
+import io.yangbob.order.app.api.order.reqres.completeorder.CompleteOrderRequest;
+import io.yangbob.order.app.api.order.reqres.order.OrderResponse;
+import io.yangbob.order.app.api.order.reqres.takeorder.ProductWithQuantityRequest;
+import io.yangbob.order.app.api.order.reqres.takeorder.ShippingInfoReqRes;
+import io.yangbob.order.app.api.order.reqres.takeorder.TakeOrderRequest;
+import io.yangbob.order.app.api.order.service.OrderQueryService;
 import io.yangbob.order.app.api.order.service.OrderService;
+import io.yangbob.order.domain.order.entity.order.Order;
 import io.yangbob.order.domain.order.entity.order.OrderId;
+import io.yangbob.order.domain.order.entity.order.OrderStatus;
 import io.yangbob.order.domain.payment.entity.PaymentMethod;
 import jakarta.validation.ConstraintViolationException;
 import org.assertj.core.api.Assertions;
@@ -20,11 +24,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import util.ConstrainedDescriptor;
+import util.EntityFactory;
 import util.JsonFileReader;
 
 import java.util.Arrays;
@@ -34,6 +41,7 @@ import java.util.stream.Stream;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
@@ -42,12 +50,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 class OrderControllerTest {
     @Autowired
     private MockMvc mvc;
-
     @Autowired
     private ObjectMapper mapper;
-
     @MockBean
     private OrderService orderService;
+    @MockBean
+    private OrderQueryService orderQueryService;
 
     private static Stream<Arguments> takeOrderArgumentNotValidTestParams() {
         return Stream.of(
@@ -81,7 +89,7 @@ class OrderControllerTest {
         when(orderService.takeOrder(mapper.readValue(requestJson, TakeOrderRequest.class))).thenReturn(createdId);
         ConstrainedDescriptor takeOrderReqDescriptor = new ConstrainedDescriptor(TakeOrderRequest.class);
         ConstrainedDescriptor productWithQuantityReqDescriptor = new ConstrainedDescriptor(ProductWithQuantityRequest.class);
-        ConstrainedDescriptor shippingInfoReqDescriptor = new ConstrainedDescriptor(ShippingInfoRequest.class);
+        ConstrainedDescriptor shippingInfoReqDescriptor = new ConstrainedDescriptor(ShippingInfoReqRes.class);
 
         mvc.perform(
                 MockMvcRequestBuilders.post("/orders")
@@ -95,6 +103,8 @@ class OrderControllerTest {
         ).andDo(
                 document(
                         "take-order",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         requestFields(
                                 takeOrderReqDescriptor.fieldWithPath("ordererId").description("주문자 회원 ID"),
                                 takeOrderReqDescriptor.fieldWithPath("productWithQuantities", "productWithQuantityRequests").description("주문 상품 목록"),
@@ -145,7 +155,7 @@ class OrderControllerTest {
         ConstrainedDescriptor descriptor = new ConstrainedDescriptor(CompleteOrderRequest.class);
 
         mvc.perform(
-                MockMvcRequestBuilders.post("/orders/{order-id}", orderId)
+                RestDocumentationRequestBuilders.post("/orders/{orderId}", orderId)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson)
@@ -154,11 +164,73 @@ class OrderControllerTest {
         ).andDo(
                 document(
                         "complete-order",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        RequestDocumentation.pathParameters(
+                                RequestDocumentation.parameterWithName("orderId").description("주문 ID")
+                        ),
                         requestFields(
-                                descriptor.fieldWithPath("paymentMethod").description("결제 수단 [ENUM] " + Arrays.toString(PaymentMethod.values()))
+                                descriptor.fieldWithPath("paymentMethod").description("결제 수단, ENUM : " + Arrays.toString(PaymentMethod.values()))
                         )
                 )
         );
     }
 
+    @Test
+    void findOrdersTest() throws Exception {
+        mvc.perform(
+                MockMvcRequestBuilders.get("/orders")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .queryParam("size", "17")
+                        .queryParam("page", "17")
+        ).andDo(print()).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        );
+    }
+
+    @Test
+    void findOrderTest() throws Exception {
+        Order order = EntityFactory.createOorder();
+        OrderResponse response = OrderResponse.of(order, null);
+        when(orderQueryService.findOrder(order.getId().toString())).thenReturn(response);
+
+        mvc.perform(
+                RestDocumentationRequestBuilders.get("/orders/{orderId}", order.getId().toString())
+                        .accept(MediaType.APPLICATION_JSON)
+        ).andDo(print()).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        ).andDo(
+                document(
+                        "find-order",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        RequestDocumentation.pathParameters(
+                                RequestDocumentation.parameterWithName("orderId").description("주문 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("orderId").description("주문 ID"),
+                                fieldWithPath("status").description("주문 상태, ENUM : " + Arrays.toString(OrderStatus.values())),
+                                fieldWithPath("productWithQuantities").description("상품 정보 목록"),
+                                fieldWithPath("productWithQuantities[].productId").description("상품 ID"),
+                                fieldWithPath("productWithQuantities[].name").description("상품 이름"),
+                                fieldWithPath("productWithQuantities[].price").description("상품 가격"),
+                                fieldWithPath("productWithQuantities[].quantity").description("상품 주문 수량"),
+                                fieldWithPath("amountInfo").description("결제 금액 정보. 결제 예정 금액 or 결제한 금액"),
+                                fieldWithPath("amountInfo.shipping").description("배송비"),
+                                fieldWithPath("amountInfo.hasDiscount").description("10% 할인 여부"),
+                                fieldWithPath("amountInfo.products").description("상품 금액"),
+                                fieldWithPath("amountInfo.total").description("최종 결제 금액"),
+                                fieldWithPath("orderTime").description("주문 시간"),
+                                fieldWithPath("ordererInfo").description("주문자 정보"),
+                                fieldWithPath("ordererInfo.name").description("주문자 이름"),
+                                fieldWithPath("ordererInfo.phoneNumber").description("주문자 전화번호"),
+                                fieldWithPath("shippingInfo").description("배송 정보"),
+                                fieldWithPath("shippingInfo.receiverName").description("배송 수령인 이름"),
+                                fieldWithPath("shippingInfo.receiverPhoneNumber").description("배송 수령인 전화번호"),
+                                fieldWithPath("shippingInfo.address").description("배송지 주소"),
+                                fieldWithPath("shippingInfo.message").description("배송 요청 메세지").optional()
+                        )
+                )
+        );
+    }
 }

@@ -1,7 +1,7 @@
 package io.yangbob.order.app.api.order.service;
 
-import io.yangbob.order.app.api.order.reqres.CompleteOrderRequest;
-import io.yangbob.order.app.api.order.reqres.TakeOrderRequest;
+import io.yangbob.order.app.api.order.reqres.completeorder.CompleteOrderRequest;
+import io.yangbob.order.app.api.order.reqres.takeorder.TakeOrderRequest;
 import io.yangbob.order.app.common.exception.NoResourceException;
 import io.yangbob.order.domain.member.entity.Member;
 import io.yangbob.order.domain.member.entity.MemberId;
@@ -9,6 +9,7 @@ import io.yangbob.order.domain.member.repository.MemberRepository;
 import io.yangbob.order.domain.order.dto.ProductWithQuantityDto;
 import io.yangbob.order.domain.order.entity.order.Order;
 import io.yangbob.order.domain.order.entity.order.OrderId;
+import io.yangbob.order.domain.order.repository.OrderQueryRepository;
 import io.yangbob.order.domain.order.repository.OrderRepository;
 import io.yangbob.order.domain.product.entity.Product;
 import io.yangbob.order.domain.product.entity.ProductId;
@@ -26,6 +27,7 @@ public class OrderService {
     private final MemberRepository memberRepository;
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
+    private final OrderQueryRepository orderQueryRepository;
 
 
     public OrderId takeOrder(TakeOrderRequest request) {
@@ -44,7 +46,7 @@ public class OrderService {
     }
 
     public void completeOrder(String orderId, CompleteOrderRequest request) {
-        Order order = orderRepository.findById(new OrderId(orderId)).orElseThrow(() -> new NoResourceException("order"));
+        Order order = orderQueryRepository.find(new OrderId(orderId)).orElseThrow(() -> new NoResourceException("order"));
         order.pay(publisher, request.paymentMethod());
     }
 }

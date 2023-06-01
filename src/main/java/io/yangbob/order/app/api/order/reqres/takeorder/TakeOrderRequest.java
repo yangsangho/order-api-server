@@ -1,4 +1,4 @@
-package io.yangbob.order.app.api.order.reqres;
+package io.yangbob.order.app.api.order.reqres.takeorder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.yangbob.order.app.common.validation.UUID;
@@ -22,7 +22,7 @@ public record TakeOrderRequest(
         @NotNull
         @Valid
         @JsonProperty("shippingInfo")
-        ShippingInfoRequest shippingInfoRequest
+        ShippingInfoReqRes shippingInfoRequest
 ) {
 
     public ShippingInfo makeShippingInfo() {

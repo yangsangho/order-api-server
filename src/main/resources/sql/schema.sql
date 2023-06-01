@@ -27,6 +27,7 @@ create table orders
     message               varchar,
     created_at            timestamp(3) not null,
     updated_at            timestamp(3) not null
+
 );
 
 create table orders_product
@@ -39,12 +40,20 @@ create table orders_product
     updated_at        timestamp(3) not null
 );
 
+CREATE INDEX orders_product_orders_id ON orders_product (orders_id);
+
 create table payment
 (
-    payment_id  uuid primary key,
-    orders_id   uuid         not null references orders on delete cascade,
-    method      varchar      not null,
-    method_data varchar      not null,
-    created_at  timestamp(3) not null,
-    updated_at  timestamp(3) not null
+    payment_id      uuid primary key,
+    orders_id       uuid         not null references orders on delete cascade,
+    method          varchar      not null,
+    method_data     varchar      not null,
+    amount_shipping integer      not null,
+    amount_products bigint       not null,
+    has_discount    boolean      not null,
+    amount_total    bigint       not null,
+    created_at      timestamp(3) not null,
+    updated_at      timestamp(3) not null
 );
+
+CREATE INDEX payment_orders_id ON payment (orders_id);

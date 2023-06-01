@@ -3,9 +3,9 @@ package io.yangbob.order.domain.order.entity.order;
 import io.yangbob.order.domain.common.entity.PrimaryKeyEntity;
 import io.yangbob.order.domain.event.PayEvent;
 import io.yangbob.order.domain.member.entity.Member;
-import io.yangbob.order.domain.order.dto.OrderAmountDto;
 import io.yangbob.order.domain.order.dto.ProductWithQuantityDto;
 import io.yangbob.order.domain.order.entity.orderproduct.OrderProduct;
+import io.yangbob.order.domain.payment.entity.AmountInfo;
 import io.yangbob.order.domain.payment.entity.Payment;
 import io.yangbob.order.domain.payment.entity.PaymentMethod;
 import jakarta.persistence.*;
@@ -59,15 +59,15 @@ public class Order extends PrimaryKeyEntity<OrderId> {
         return Collections.unmodifiableList(orderProducts);
     }
 
-    public OrderAmountDto getAmounts() {
+    public AmountInfo getAmounts() {
         final long productsAmount = orderProducts.stream().mapToLong(OrderProduct::getAmount).sum();
         final int shippingAmount = shippingInfo.getAmount();
         final boolean hasDiscount = hasDiscount();
 
-        return new OrderAmountDto(
+        return new AmountInfo(
                 shippingAmount,
-                productsAmount,
                 hasDiscount,
+                productsAmount,
                 (hasDiscount ? (long) (productsAmount * 0.9) : productsAmount) + shippingAmount
         );
     }
@@ -77,7 +77,7 @@ public class Order extends PrimaryKeyEntity<OrderId> {
     }
 
     public void pay(ApplicationEventPublisher publisher, PaymentMethod method) {
-        Payment payment = new Payment(this, method);
+        Payment payment = new Payment(this, method, getAmounts());
         publisher.publishEvent(new PayEvent(payment));
 
         status = OrderStatus.COMPLETED;

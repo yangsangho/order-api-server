@@ -1,4 +1,4 @@
-package io.yangbob.order.app.api.order.reqres;
+package io.yangbob.order.app.api.order.reqres.completeorder;
 
 import io.yangbob.order.domain.payment.entity.PaymentMethod;
 

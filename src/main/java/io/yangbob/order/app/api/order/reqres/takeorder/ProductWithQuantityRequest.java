@@ -1,4 +1,4 @@
-package io.yangbob.order.app.api.order.reqres;
+package io.yangbob.order.app.api.order.reqres.takeorder;
 
 import io.yangbob.order.app.common.validation.UUID;
 import jakarta.validation.constraints.NotNull;

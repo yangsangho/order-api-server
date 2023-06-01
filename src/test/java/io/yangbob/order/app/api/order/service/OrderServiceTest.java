@@ -1,9 +1,9 @@
 package io.yangbob.order.app.api.order.service;
 
-import io.yangbob.order.app.api.order.reqres.CompleteOrderRequest;
-import io.yangbob.order.app.api.order.reqres.ProductWithQuantityRequest;
-import io.yangbob.order.app.api.order.reqres.ShippingInfoRequest;
-import io.yangbob.order.app.api.order.reqres.TakeOrderRequest;
+import io.yangbob.order.app.api.order.reqres.completeorder.CompleteOrderRequest;
+import io.yangbob.order.app.api.order.reqres.takeorder.ProductWithQuantityRequest;
+import io.yangbob.order.app.api.order.reqres.takeorder.ShippingInfoReqRes;
+import io.yangbob.order.app.api.order.reqres.takeorder.TakeOrderRequest;
 import io.yangbob.order.app.common.exception.NoResourceException;
 import io.yangbob.order.domain.event.PayEvent;
 import io.yangbob.order.domain.member.entity.Member;
@@ -12,6 +12,7 @@ import io.yangbob.order.domain.order.entity.order.Order;
 import io.yangbob.order.domain.order.entity.order.OrderId;
 import io.yangbob.order.domain.order.entity.order.OrderStatus;
 import io.yangbob.order.domain.order.entity.orderproduct.OrderProduct;
+import io.yangbob.order.domain.order.repository.OrderQueryRepository;
 import io.yangbob.order.domain.order.repository.OrderRepository;
 import io.yangbob.order.domain.payment.entity.PaymentMethod;
 import io.yangbob.order.domain.product.entity.Product;
@@ -45,7 +46,8 @@ class OrderServiceTest {
     private ProductRepository productRepository;
     @Mock
     private OrderRepository orderRepository;
-
+    @Mock
+    private OrderQueryRepository orderQueryRepository;
     @Mock
     private ApplicationEventPublisher publisher;
 
@@ -67,7 +69,7 @@ class OrderServiceTest {
                         new ProductWithQuantityRequest(p1.getId().toString(), 1),
                         new ProductWithQuantityRequest(p2.getId().toString(), 2)
                 ),
-                new ShippingInfoRequest("yangbob", "01012341234", "서울특별시", "문 앞에 두세요")
+                new ShippingInfoReqRes("yangbob", "01012341234", "서울특별시", "문 앞에 두세요")
         );
 
         OrderId createdId = orderService.takeOrder(request);
@@ -98,7 +100,7 @@ class OrderServiceTest {
         TakeOrderRequest request = new TakeOrderRequest(
                 UUID.randomUUID().toString(),
                 List.of(),
-                new ShippingInfoRequest("yangbob", "01012341234", "서울특별시", "문 앞에 두세요")
+                new ShippingInfoReqRes("yangbob", "01012341234", "서울특별시", "문 앞에 두세요")
         );
 
         assertThatThrownBy(() -> orderService.takeOrder(request)).isInstanceOf(NoResourceException.class);
@@ -114,7 +116,7 @@ class OrderServiceTest {
         TakeOrderRequest request = new TakeOrderRequest(
                 member.getId().toString(),
                 List.of(new ProductWithQuantityRequest(UUID.randomUUID().toString(), 1)),
-                new ShippingInfoRequest("yangbob", "01012341234", "서울특별시", "문 앞에 두세요")
+                new ShippingInfoReqRes("yangbob", "01012341234", "서울특별시", "문 앞에 두세요")
         );
 
         assertThatThrownBy(() -> orderService.takeOrder(request)).isInstanceOf(NoResourceException.class);
@@ -125,7 +127,7 @@ class OrderServiceTest {
         Order order = EntityFactory.createOorder();
         assertThat(order.getStatus()).isEqualTo(OrderStatus.RECEIPTED);
 
-        when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+        when(orderQueryRepository.find(order.getId())).thenReturn(Optional.of(order));
         doNothing().when(publisher).publishEvent(any(PayEvent.class));
 
         PaymentMethod method = PaymentMethod.CARD;
@@ -140,7 +142,7 @@ class OrderServiceTest {
     @Test
     void completeOrderNoOrderTest() {
         OrderId orderId = new OrderId();
-        when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
+        when(orderQueryRepository.find(orderId)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> orderService.completeOrder(orderId.toString(), new CompleteOrderRequest(PaymentMethod.CARD))).isInstanceOf(NoResourceException.class);
     }
 }

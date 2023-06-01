@@ -15,11 +15,12 @@ public class Payment extends PrimaryKeyEntity<PaymentId> {
         super(new PaymentId());
     }
 
-    public Payment(Order order, PaymentMethod method) {
+    public Payment(Order order, PaymentMethod method, AmountInfo amountInfo) {
         super(new PaymentId());
         this.order = order;
         this.method = method;
         this.methodData = "{}";
+        this.amountInfo = amountInfo;
     }
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -32,4 +33,7 @@ public class Payment extends PrimaryKeyEntity<PaymentId> {
 
     @Column(columnDefinition = "varchar", nullable = false)
     private String methodData;
+
+    @Embedded
+    private AmountInfo amountInfo;
 }

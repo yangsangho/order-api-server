@@ -1,0 +1,113 @@
+package io.yangbob.order.app.api.order.service;
+
+import io.yangbob.order.app.api.order.reqres.order.OrderResponse;
+import io.yangbob.order.app.api.order.reqres.order.ProductWithQuantityResponse;
+import io.yangbob.order.app.common.exception.NoResourceException;
+import io.yangbob.order.domain.event.PayEvent;
+import io.yangbob.order.domain.order.entity.order.Order;
+import io.yangbob.order.domain.order.entity.order.OrderId;
+import io.yangbob.order.domain.order.entity.orderproduct.OrderProduct;
+import io.yangbob.order.domain.order.repository.OrderQueryRepository;
+import io.yangbob.order.domain.payment.entity.AmountInfo;
+import io.yangbob.order.domain.payment.entity.Payment;
+import io.yangbob.order.domain.payment.entity.PaymentMethod;
+import io.yangbob.order.domain.payment.repository.PaymentRepository;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
+import util.EntityFactory;
+
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class OrderQueryServiceTest {
+    @InjectMocks
+    private OrderQueryService orderQueryService;
+    @Mock
+    private OrderQueryRepository orderQueryRepository;
+    @Mock
+    private PaymentRepository paymentRepository;
+
+    private static Stream<Arguments> findOrderTestParams() {
+        Order order1 = EntityFactory.createOorder();
+        Order order2 = EntityFactory.createOorder();
+        ApplicationEventPublisher publisher = mock();
+        doNothing().when(publisher).publishEvent(any());
+        order2.pay(publisher, PaymentMethod.PHONE);
+        Payment payment = new Payment(order2, PaymentMethod.PHONE, order2.getAmounts());
+
+        return Stream.of(
+                Arguments.of(order1, null, order1.getAmounts()),
+                Arguments.of(order2, payment, payment.getAmountInfo())
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("findOrderTestParams")
+    void findOrderTest(Order order, Payment payment, AmountInfo amountInfo) {
+        when(orderQueryRepository.find(order.getId())).thenReturn(Optional.of(order));
+        if (payment != null) {
+            when(paymentRepository.findByOrder(order)).thenReturn(Optional.of(payment));
+        }
+
+        OrderResponse response = orderQueryService.findOrder(order.getId().toString());
+
+        assertThat(response.orderId()).isEqualTo(order.getId().toString());
+        assertThat(response.status()).isEqualTo(order.getStatus());
+
+        for (int i = 0; i < order.getOrderProducts().size(); i++) {
+            ProductWithQuantityResponse productWithQuantityResponse = response.productWithQuantities().get(i);
+            OrderProduct orderProduct = order.getOrderProducts().get(i);
+
+            assertThat(productWithQuantityResponse.productId()).isEqualTo(orderProduct.getProduct().getId().toString());
+            assertThat(productWithQuantityResponse.name()).isEqualTo(orderProduct.getProduct().getName());
+            assertThat(productWithQuantityResponse.price()).isEqualTo(orderProduct.getProduct().getPrice());
+            assertThat(productWithQuantityResponse.quantity()).isEqualTo(orderProduct.getQuantity());
+        }
+
+        assertThat(response.amountInfo().shipping()).isEqualTo(amountInfo.getShipping());
+        assertThat(response.amountInfo().hasDiscount()).isEqualTo(amountInfo.hasDiscount());
+        assertThat(response.amountInfo().products()).isEqualTo(amountInfo.getProducts());
+        assertThat(response.amountInfo().total()).isEqualTo(amountInfo.getTotal());
+
+        assertThat(response.orderTime()).isEqualTo(order.getCreatedAt());
+        assertThat(response.ordererInfo().name()).isEqualTo(order.getOrderer().getName());
+        assertThat(response.ordererInfo().phoneNumber()).isEqualTo(order.getOrderer().getPhoneNumber());
+        assertThat(response.shippingInfo().receiverName()).isEqualTo(order.getShippingInfo().getReceiver().getName());
+        assertThat(response.shippingInfo().receiverPhoneNumber()).isEqualTo(order.getShippingInfo().getReceiver().getPhoneNumber());
+        assertThat(response.shippingInfo().address()).isEqualTo(order.getShippingInfo().getAddress());
+        assertThat(response.shippingInfo().message()).isEqualTo(order.getShippingInfo().getMessage());
+    }
+
+    @Test
+    void findOrderNoOrderTest() {
+        OrderId orderId = new OrderId();
+        when(orderQueryRepository.find(orderId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> orderQueryService.findOrder(orderId.toString())).isInstanceOf(NoResourceException.class);
+    }
+
+    @Test
+    void findOrderNoPaymentTest() {
+        Order order = EntityFactory.createOorder();
+        ApplicationEventPublisher publisher = mock();
+        doNothing().when(publisher).publishEvent(any(PayEvent.class));
+        order.pay(publisher, PaymentMethod.PHONE);
+
+        when(orderQueryRepository.find(order.getId())).thenReturn(Optional.of(order));
+        when(paymentRepository.findByOrder(order)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> orderQueryService.findOrder(order.getId().toString())).isInstanceOf(NoResourceException.class);
+    }
+}

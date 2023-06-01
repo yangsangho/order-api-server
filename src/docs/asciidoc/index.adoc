@@ -33,8 +33,25 @@ include::{snippets}/take-order/response-fields.adoc[]
 .http-request
 include::{snippets}/complete-order/http-request.adoc[]
 
+.path-parameters
+include::{snippets}/complete-order/path-parameters.adoc[]
+
 .request-fields
 include::{snippets}/complete-order/request-fields.adoc[]
 
 .http-response
 include::{snippets}/complete-order/http-response.adoc[]
+
+=== 단일 주문 조회
+
+.http-request
+include::{snippets}/find-order/http-request.adoc[]
+
+.path-parameters
+include::{snippets}/find-order/path-parameters.adoc[]
+
+.http-response
+include::{snippets}/find-order/http-response.adoc[]
+
+.response-fields
+include::{snippets}/find-order/response-fields.adoc[]

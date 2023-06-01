@@ -1,11 +1,10 @@
 package io.yangbob.order.domain.order.entity.order;
 
-import util.EntityFactory;
 import io.yangbob.order.domain.event.PayEvent;
 import io.yangbob.order.domain.member.entity.Member;
-import io.yangbob.order.domain.order.dto.OrderAmountDto;
 import io.yangbob.order.domain.order.dto.ProductWithQuantityDto;
 import io.yangbob.order.domain.order.entity.orderproduct.OrderProduct;
+import io.yangbob.order.domain.payment.entity.AmountInfo;
 import io.yangbob.order.domain.payment.entity.PaymentMethod;
 import io.yangbob.order.domain.product.entity.Product;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +14,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.context.ApplicationEventPublisher;
+import util.EntityFactory;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -90,11 +90,11 @@ class OrderTest {
         ShippingInfo shippingInfo = new ShippingInfo(receiver, param.address, "문 앞에 두세요");
         Order order = new Order(member, shippingInfo, productWithQuantities);
 
-        OrderAmountDto amounts = order.getAmounts();
-        assertThat(amounts.shippingAmount()).isEqualTo(param.expectedShippingAmount);
+        AmountInfo amounts = order.getAmounts();
+        assertThat(amounts.getShipping()).isEqualTo(param.expectedShippingAmount);
         assertThat(amounts.hasDiscount()).isEqualTo(param.expectedHasDiscount);
-        assertThat(amounts.productsAmount()).isEqualTo(param.expectedProductsAmount);
-        assertThat(amounts.totalAmount()).isEqualTo(param.expectedTotalAmount);
+        assertThat(amounts.getProducts()).isEqualTo(param.expectedProductsAmount);
+        assertThat(amounts.getTotal()).isEqualTo(param.expectedTotalAmount);
     }
 
     @Test
