@@ -12,6 +12,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.ArrayList;
@@ -53,7 +54,12 @@ public class Order extends PrimaryKeyEntity<OrderId> {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @Getter(AccessLevel.NONE)
+//    @BatchSize(size = 100)
     private List<OrderProduct> orderProducts = new ArrayList<>();
+
+    public void updateOrderProducts(List<OrderProduct> orderProducts) {
+        this.orderProducts = orderProducts;
+    }
 
     public List<OrderProduct> getOrderProducts() {
         return Collections.unmodifiableList(orderProducts);

@@ -3,9 +3,13 @@ package io.yangbob.order.app.api.order.service;
 import io.yangbob.order.app.api.order.reqres.order.OrderResponse;
 import io.yangbob.order.app.api.order.reqres.order.ProductWithQuantityResponse;
 import io.yangbob.order.app.common.exception.NoResourceException;
+import io.yangbob.order.app.common.reqres.CommonPageResponse;
 import io.yangbob.order.domain.event.PayEvent;
+import io.yangbob.order.domain.order.data.OrderFilter;
+import io.yangbob.order.domain.order.dto.OrdersResponseDto;
 import io.yangbob.order.domain.order.entity.order.Order;
 import io.yangbob.order.domain.order.entity.order.OrderId;
+import io.yangbob.order.domain.order.entity.order.OrderStatus;
 import io.yangbob.order.domain.order.entity.orderproduct.OrderProduct;
 import io.yangbob.order.domain.order.repository.OrderQueryRepository;
 import io.yangbob.order.domain.payment.entity.AmountInfo;
@@ -21,8 +25,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import util.EntityFactory;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -109,5 +119,25 @@ class OrderQueryServiceTest {
         when(paymentRepository.findByOrder(order)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> orderQueryService.findOrder(order.getId().toString())).isInstanceOf(NoResourceException.class);
+    }
+
+    @Test
+    void findOrdersTest() {
+        List<OrdersResponseDto> dtos = List.of(
+                new OrdersResponseDto("상품1 외 1건", OrderStatus.COMPLETED, 10000, LocalDateTime.now()),
+                new OrdersResponseDto("상품2", OrderStatus.RECEIPTED, 20000, LocalDateTime.now()),
+                new OrdersResponseDto("상품3 외 4건", OrderStatus.COMPLETED, 45000, LocalDateTime.now())
+        );
+
+        Pageable pageable = PageRequest.of(10, 3);
+        Page<OrdersResponseDto> pageResponse = new PageImpl<>(dtos, pageable, 99);
+        when(orderQueryRepository.findAll(any(Pageable.class), any(OrderFilter.class))).thenReturn(pageResponse);
+
+        CommonPageResponse<OrdersResponseDto> response = orderQueryService.findOrders(pageable, OrderFilter.NONE);
+        assertThat(response.totalElementsCount()).isEqualTo(99);
+        assertThat(response.totalPage()).isEqualTo(33);
+        assertThat(response.page()).isEqualTo(10);
+        assertThat(response.size()).isEqualTo(3);
+        assertThat(response.elements()).containsAll(dtos);
     }
 }

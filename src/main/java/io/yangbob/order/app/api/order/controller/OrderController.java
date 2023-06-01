@@ -6,14 +6,16 @@ import io.yangbob.order.app.api.order.reqres.takeorder.CreatedOrderId;
 import io.yangbob.order.app.api.order.reqres.takeorder.TakeOrderRequest;
 import io.yangbob.order.app.api.order.service.OrderQueryService;
 import io.yangbob.order.app.api.order.service.OrderService;
+import io.yangbob.order.app.common.reqres.CommonPageResponse;
 import io.yangbob.order.app.common.validation.UUID;
 import io.yangbob.order.domain.order.data.OrderFilter;
-import io.yangbob.order.domain.order.data.OrderSort;
+import io.yangbob.order.domain.order.dto.OrdersResponseDto;
 import io.yangbob.order.domain.order.entity.order.OrderId;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -46,13 +48,12 @@ public class OrderController {
     }
 
     @GetMapping
-    void findOrders(
-            @PageableDefault(size = 5) Pageable pageable,
-            @RequestParam(required = false) OrderSort sort,
-            @RequestParam(required = false) OrderFilter filter
+    CommonPageResponse<OrdersResponseDto> findOrders(
+            @PageableDefault(size = 5, sort = "ORDER_TIME", direction = Sort.Direction.ASC) Pageable pageable,
+            @RequestParam(required = false, defaultValue = "NONE") OrderFilter filter
     ) {
-        log.info("findOrders pageable = {}, sort = {}, filter = {}", pageable, sort, filter);
-//        pageable.getSort().
+        log.info("findOrders pageable = {}, filter = {}", pageable, filter);
+        return orderQueryService.findOrders(pageable, filter);
     }
 
     @GetMapping("/{order-id}")

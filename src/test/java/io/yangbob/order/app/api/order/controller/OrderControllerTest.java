@@ -8,6 +8,10 @@ import io.yangbob.order.app.api.order.reqres.takeorder.ShippingInfoReqRes;
 import io.yangbob.order.app.api.order.reqres.takeorder.TakeOrderRequest;
 import io.yangbob.order.app.api.order.service.OrderQueryService;
 import io.yangbob.order.app.api.order.service.OrderService;
+import io.yangbob.order.app.common.reqres.CommonPageResponse;
+import io.yangbob.order.domain.order.data.OrderFilter;
+import io.yangbob.order.domain.order.data.OrderSort;
+import io.yangbob.order.domain.order.dto.OrdersResponseDto;
 import io.yangbob.order.domain.order.entity.order.Order;
 import io.yangbob.order.domain.order.entity.order.OrderId;
 import io.yangbob.order.domain.order.entity.order.OrderStatus;
@@ -22,6 +26,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
@@ -34,7 +41,9 @@ import util.ConstrainedDescriptor;
 import util.EntityFactory;
 import util.JsonFileReader;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -43,6 +52,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @WebMvcTest(OrderController.class)
@@ -167,7 +178,7 @@ class OrderControllerTest {
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         RequestDocumentation.pathParameters(
-                                RequestDocumentation.parameterWithName("orderId").description("주문 ID")
+                                parameterWithName("orderId").description("주문 ID")
                         ),
                         requestFields(
                                 descriptor.fieldWithPath("paymentMethod").description("결제 수단, ENUM : " + Arrays.toString(PaymentMethod.values()))
@@ -178,13 +189,49 @@ class OrderControllerTest {
 
     @Test
     void findOrdersTest() throws Exception {
+        Sort sort = Sort.by(OrderSort.ORDER_TIME.name()).ascending();
+        Pageable pageable = PageRequest.of(0, 5, sort);
+        OrderFilter filter = OrderFilter.STATUS_COMPLETED;
+
+        List<OrdersResponseDto> dtos = List.of(
+                new OrdersResponseDto("상품1 외 1건", OrderStatus.COMPLETED, 10000, LocalDateTime.now()),
+                new OrdersResponseDto("상품2 외 4건", OrderStatus.COMPLETED, 45000, LocalDateTime.now())
+        );
+        CommonPageResponse<OrdersResponseDto> response = new CommonPageResponse<>(2, 0, 0, 5, dtos);
+        when(orderQueryService.findOrders(pageable, filter)).thenReturn(response);
+
         mvc.perform(
                 MockMvcRequestBuilders.get("/orders")
                         .accept(MediaType.APPLICATION_JSON)
-                        .queryParam("size", "17")
-                        .queryParam("page", "17")
+                        .queryParam("page", String.valueOf(pageable.getPageNumber()))
+                        .queryParam("size", String.valueOf(pageable.getPageSize()))
+                        .queryParam("sort", OrderSort.ORDER_TIME.name(), "ASC")
+                        .queryParam("filter", filter.toString())
         ).andDo(print()).andExpect(
                 MockMvcResultMatchers.status().isOk()
+        ).andDo(
+                document(
+                        "find-orders",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        RequestDocumentation.queryParameters(
+                                parameterWithName("page").description("주문 목록 페이지 번호").attributes(key("defaults").value("5")).optional(),
+                                parameterWithName("size").description("각 페이지별 크기").attributes(key("defaults").value("0")).optional(),
+                                parameterWithName("sort").description("주문 목록 정렬 정보, ENUM : " + Arrays.toString(OrderSort.values())).attributes(key("defaults").value("ORDER_TIME, ASC")).optional(),
+                                parameterWithName("filter").description("주문 목록 필터 정보, ENUM : " + Arrays.toString(OrderFilter.values())).attributes(key("defaults").value("NONE")).optional()
+                        ),
+                        responseFields(
+                                fieldWithPath("totalElementsCount").description("전체 주문 개수"),
+                                fieldWithPath("totalPage").description("전체 페이지 개수"),
+                                fieldWithPath("page").description("현재 페이지 번호"),
+                                fieldWithPath("size").description("현재 페이지 크기"),
+                                fieldWithPath("elements").description("주문 목록"),
+                                fieldWithPath("elements[].representativeProductName").description("상품 대표 이름"),
+                                fieldWithPath("elements[].status").description("주문 상태"),
+                                fieldWithPath("elements[].totalAmount").description("최종 결제 금액"),
+                                fieldWithPath("elements[].orderTime").description("주문 시간")
+                        )
+                )
         );
     }
 
@@ -205,7 +252,7 @@ class OrderControllerTest {
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         RequestDocumentation.pathParameters(
-                                RequestDocumentation.parameterWithName("orderId").description("주문 ID")
+                                parameterWithName("orderId").description("주문 ID")
                         ),
                         responseFields(
                                 fieldWithPath("orderId").description("주문 ID"),

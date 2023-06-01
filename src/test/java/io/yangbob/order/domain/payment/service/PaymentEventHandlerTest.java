@@ -1,6 +1,5 @@
 package io.yangbob.order.domain.payment.service;
 
-import util.EntityFactory;
 import io.yangbob.order.domain.member.entity.Member;
 import io.yangbob.order.domain.member.repository.MemberRepository;
 import io.yangbob.order.domain.order.dto.ProductWithQuantityDto;
@@ -18,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
+import util.EntityFactory;
 
 import java.util.List;
 
