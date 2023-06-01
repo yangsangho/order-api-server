@@ -37,11 +37,11 @@ class OrderRepositoryTest {
     @DisplayName("기본적인 저장 및 조회")
     void saveAndFindAndDeleteTest() {
         Member member = EntityFactory.createMember();
-        List<ProductWithQuantityDto> productWithQuantityList = EntityFactory.createProductWithQuantityList();
-        Order order = EntityFactory.createOorder(member, productWithQuantityList);
+        List<ProductWithQuantityDto> productWithQuantities = EntityFactory.createProductWithQuantities();
+        Order order = EntityFactory.createOorder(member, productWithQuantities);
 
         memberRepository.save(member);
-        productWithQuantityList.forEach(productWithQuantityDto -> productRepository.save(productWithQuantityDto.product()));
+        productWithQuantities.forEach(productWithQuantityDto -> productRepository.save(productWithQuantityDto.product()));
         OrderId orderId = order.getId();
         assertThat(orderRepository.findById(orderId).isPresent()).isFalse();
 
@@ -58,8 +58,8 @@ class OrderRepositoryTest {
         List<OrderProduct> orderProducts = findOrder.getOrderProducts();
         assertThat(orderProducts).hasSize(2);
         for (int i = 0; i < orderProducts.size(); i++) {
-            assertThat(orderProducts.get(i).getProduct()).isEqualTo(productWithQuantityList.get(i).product());
-            assertThat(orderProducts.get(i).getQuantity()).isEqualTo(productWithQuantityList.get(i).quantity());
+            assertThat(orderProducts.get(i).getProduct()).isEqualTo(productWithQuantities.get(i).product());
+            assertThat(orderProducts.get(i).getQuantity()).isEqualTo(productWithQuantities.get(i).quantity());
         }
 
         orderRepository.delete(findOrder);

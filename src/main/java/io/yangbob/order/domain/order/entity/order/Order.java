@@ -28,13 +28,13 @@ public class Order extends PrimaryKeyEntity<OrderId> {
         super(new OrderId());
     }
 
-    public Order(Member orderer, ShippingInfo shippingInfo, List<ProductWithQuantityDto> productWithQuantityList) {
+    public Order(Member orderer, ShippingInfo shippingInfo, List<ProductWithQuantityDto> productWithQuantities) {
         super(new OrderId());
         this.orderer = orderer;
         this.status = OrderStatus.RECEIPTED;
         this.shippingInfo = shippingInfo;
         orderProducts.addAll(
-                productWithQuantityList.stream()
+                productWithQuantities.stream()
                         .map(dto -> new OrderProduct(this, dto.product(), dto.quantity()))
                         .toList()
         );

@@ -22,7 +22,7 @@ public class EntityFactory {
         return new ShippingInfo(createReceiver(member), "서울특별시", "문 앞에 두세요");
     }
 
-    public static List<ProductWithQuantityDto> createProductWithQuantityList() {
+    public static List<ProductWithQuantityDto> createProductWithQuantities() {
         Product p1 = new Product("선풍기", 125000);
         Product p2 = new Product("충전기", 7000);
         return List.of(new ProductWithQuantityDto(p1, 1), new ProductWithQuantityDto(p2, 4));
@@ -33,10 +33,10 @@ public class EntityFactory {
     }
 
     public static Order createOorder(Member member) {
-        return createOorder(member, createProductWithQuantityList());
+        return createOorder(member, createProductWithQuantities());
     }
 
-    public static Order createOorder(Member member, List<ProductWithQuantityDto> productWithQuantityList) {
-        return new Order(member, createShippingInfo(member), productWithQuantityList);
+    public static Order createOorder(Member member, List<ProductWithQuantityDto> productWithQuantities) {
+        return new Order(member, createShippingInfo(member), productWithQuantities);
     }
 }

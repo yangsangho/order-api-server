@@ -45,10 +45,10 @@ class PaymentEventHandlerTest {
         Member member = EntityFactory.createMember();
         memberRepository.save(member);
 
-        List<ProductWithQuantityDto> productWithQuantityList = EntityFactory.createProductWithQuantityList();
-        productWithQuantityList.forEach(productWithQuantityDto -> productRepository.save(productWithQuantityDto.product()));
+        List<ProductWithQuantityDto> productWithQuantities = EntityFactory.createProductWithQuantities();
+        productWithQuantities.forEach(productWithQuantityDto -> productRepository.save(productWithQuantityDto.product()));
 
-        Order order = EntityFactory.createOorder(member, productWithQuantityList);
+        Order order = EntityFactory.createOorder(member, productWithQuantities);
         orderRepository.save(order);
         em.flush();
         em.clear();

@@ -1,18 +1,21 @@
 package io.yangbob.order.domain.order.entity.order;
 
-import com.github.f4b6a3.ulid.UlidCreator;
+import io.yangbob.order.domain.common.entity.PrimaryKey;
+import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
-import java.util.UUID;
 
 @Embeddable
-@NoArgsConstructor
-@EqualsAndHashCode
-public class OrderId implements Serializable {
-    @Column(name = "orders_id", columnDefinition = "uuid", nullable = false)
-    private final UUID id = UlidCreator.getMonotonicUlid().toUuid();
+@AttributeOverride(
+        name = "id",
+        column = @Column(name = "orders_id")
+)
+public class OrderId extends PrimaryKey {
+    public OrderId() {
+        super();
+    }
+
+    public OrderId(String uuid) {
+        super(uuid);
+    }
 }

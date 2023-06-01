@@ -84,11 +84,11 @@ class OrderTest {
         Member member = EntityFactory.createMember();
         Product p1 = new Product("선풍기", 45000);
         Product p2 = new Product("충전기", 10000);
-        List<ProductWithQuantityDto> productWithQuantityList = List.of(new ProductWithQuantityDto(p1, param.p1Quantity), new ProductWithQuantityDto(p2, param.p2Quantity));
+        List<ProductWithQuantityDto> productWithQuantities = List.of(new ProductWithQuantityDto(p1, param.p1Quantity), new ProductWithQuantityDto(p2, param.p2Quantity));
 
         Receiver receiver = new Receiver(member.getName(), member.getPhoneNumber());
         ShippingInfo shippingInfo = new ShippingInfo(receiver, param.address, "문 앞에 두세요");
-        Order order = new Order(member, shippingInfo, productWithQuantityList);
+        Order order = new Order(member, shippingInfo, productWithQuantities);
 
         OrderAmountDto amounts = order.getAmounts();
         assertThat(amounts.shippingAmount()).isEqualTo(param.expectedShippingAmount);
